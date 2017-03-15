@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.udea.iw.dao.CiudadDao;
 import com.udea.iw.dao.DataSource;
 import com.udea.iw.dto.Ciudad;
@@ -50,5 +49,35 @@ public class CiudadDaoImplementation implements CiudadDao{
 	}
 	return lista;
 	}
+	
+	public Ciudad obtener(Long codigo) throws Exception1{
+		Ciudad ciudad = null;
+		Connection con = null;
+		PreparedStatement ps= null;
+		ResultSet rs=null;
+		try {
+			con = DataSource.getConnection();
+			ps = con.prepareStatement("SELECT * FROM ciudades WHERE codigo=?");
+			ps.setLong(1, codigo); //Evita SQL Injection
+			rs= ps.executeQuery();
+			if(rs.next()) {
+				ciudad = new Ciudad();
+				ciudad.setCodigo(rs.getLong("codigo"));
+				ciudad.setNombre(rs.getString("nombre"));
+				ciudad.setCodigoArea(rs.getString("codigoArea"));
+			}
+		}catch(SQLException e){
+			throw new Exception1("No se realizó la conexión",e);
+		}finally{
+			try{
+				rs.close();
+				ps.close();
+				con.close();
+			}catch(SQLException e){
+				e.printStackTrace();	//No se realiza en una buena practica 
+			}
+		}
+		return ciudad;
+		}
 
 }
